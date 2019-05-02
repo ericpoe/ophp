@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Haystack\Tests\Functional;
 
 use Haystack\HString;
@@ -9,12 +11,12 @@ class HStringWalkTest extends TestCase
     /** @var HString */
     protected $aString;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->aString = new HString('foobar');
     }
 
-    public function testStringWalk()
+    public function testStringWalk(): void
     {
         $this->aString->walk(function ($letter, $key) {
             return $this->aString[$key] = strtoupper($letter);

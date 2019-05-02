@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Haystack\Tests\Converter;
 
 use Haystack\HArray;
@@ -7,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 class StringToArrayTest extends TestCase
 {
-    public function testHStringToArray()
+    public function testHStringToArray(): void
     {
         $emptyString = new HString();
         $expected = [];
@@ -26,12 +28,12 @@ class StringToArrayTest extends TestCase
      * @param int|null $limit
      * @param HArray $expected
      */
-    public function testStringToHArray(HString $hString, $delim, $limit, HArray $expected)
+    public function testStringToHArray(HString $hString, ?string $delim, ?int $limit, HArray $expected): void
     {
         $this->assertEquals($expected, $hString->toHArray($delim, $limit));
     }
 
-    public function stringToHArrayProvider()
+    public function stringToHArrayProvider(): array
     {
         $jabberwocky = "'Twas brillig and the slithy toves";
         $jabberwockyColon = "'Twas:brillig:and:the:slithy:toves";
@@ -59,52 +61,6 @@ class StringToArrayTest extends TestCase
             'String of words with space delims & limit' => [new HString($jabberwocky), ' ', 3, new HArray(["'Twas", 'brillig', 'and the slithy toves'])],
             'String of UTF-8 words with space delims & limit' => [new HString($jabberUTF8), ' ', 3, new HArray(['sǝʌoʇ', 'ʎɥʇᴉls', 'ǝɥʇ puɐ ƃᴉllᴉɹq sɐʍ┴,'])],
             'String of words with colon delims & limit' => [new HString($jabberwockyColon), ':', 3, new HArray(["'Twas", 'brillig', 'and:the:slithy:toves'])],
-        ];
-    }
-
-    /**
-     * @dataProvider badDelimInStringToArrayProvider
-     *
-     * @param string|null $delim
-     * @param string $exceptionMsg
-     */
-    public function testBadDelimInStringToArray($delim, $exceptionMsg)
-    {
-        $hSTring = new HString('foobar');
-
-        $this->expectException('InvalidArgumentException');
-        $this->expectExceptionMessage($exceptionMsg);
-
-        $hSTring->toHArray($delim);
-    }
-
-    public function badDelimInStringToArrayProvider()
-    {
-        return [
-            'DateTime delim' => [new \DateTime(), 'delimiter must be a string'],
-        ];
-    }
-
-    /**
-     * @dataProvider badLimitInStringToArrayProvider
-     * @param int|null $limit
-     * @param string $exceptionMsg
-     */
-    public function testBadLimitInStringToArray($limit, $exceptionMsg)
-    {
-        $hString = new HString('foobar');
-
-        $this->expectException('InvalidArgumentException');
-        $this->expectExceptionMessage($exceptionMsg);
-
-        $hString->toHArray(' ', $limit);
-    }
-
-    public function badLimitInStringToArrayProvider()
-    {
-        return [
-            'DateTime limit' => [new \DateTime(), 'limit must be an integer'],
-            'Integer String limit' => ['3', 'limit must be an integer'],
         ];
     }
 }

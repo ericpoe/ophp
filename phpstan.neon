@@ -1,0 +1,7 @@
+parameters:
+    autoload_files:
+        - vendor/autoload.php
+    level: 7
+    paths:
+        - src
+        - tests

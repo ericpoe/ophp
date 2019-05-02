@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Haystack\Tests\Functional;
 
 use Haystack\HString;
@@ -8,27 +10,28 @@ class HStringFilterTest extends TestCase
 {
     /** @var HString */
     protected $aString;
+
     /** @var HString */
     protected $utf8String;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->aString = new HString('foobar');
         $this->utf8String = new HString('ɹɐqooɟ');
     }
 
-    public function testStringDefaultFilter()
+    public function testStringDefaultFilter(): void
     {
-        $strangeString = $this->aString->insert(0, 3);
+        $strangeString = $this->aString->insert('0', 3);
         $default = $strangeString->filter();
         $this->assertEquals('foobar', $default->toString(), 'Filter with defaults');
 
-        $strangeString = $this->utf8String->insert(0, 3);
+        $strangeString = $this->utf8String->insert('0', 3);
         $default = $strangeString->filter();
         $this->assertEquals('ɹɐqooɟ', $default->toString(), 'Filter with defaults');
     }
 
-    public function testStringValuesFilter()
+    public function testStringValuesFilter(): void
     {
         $removeVowels = function ($letter) {
             $vowels = new HString('aeiouᴉǝɐ');
@@ -43,7 +46,7 @@ class HStringFilterTest extends TestCase
         $this->assertEquals('ɹqɟ', $consonants->toString(), 'Filter by Value');
     }
 
-    public function testStringKeyFilter()
+    public function testStringKeyFilter(): void
     {
         $removeOdd = function ($key) {
             return $key % 2;
@@ -62,7 +65,7 @@ class HStringFilterTest extends TestCase
         $this->assertEquals('obr', $even->toString(), 'Filter by Key');
     }
 
-    public function testStringValueAndKeyFilter()
+    public function testStringValueAndKeyFilter(): void
     {
 
         $alpha = new HString('abcdefghijklmnopqrstuvwxyz');
@@ -85,7 +88,7 @@ class HStringFilterTest extends TestCase
         $this->assertEquals('ɐoɟ', $utf8Funky->toString(), 'Filter by both Value & Key');
     }
 
-    public function testInvalidFilterFlag()
+    public function testInvalidFilterFlag(): void
     {
         $this->expectException('InvalidArgumentException');
         $this->expectExceptionMessage('Invalid flag name');

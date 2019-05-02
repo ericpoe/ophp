@@ -1,19 +1,21 @@
 <?php
+declare(strict_types=1);
+
 namespace Haystack\Functional;
 
-use Haystack\HArray;
+use Haystack\HaystackInterface;
 
 class Filter
 {
     /** @var array */
     private $arr;
 
-    public function __construct(HArray $array)
+    public function __construct(HaystackInterface $array)
     {
         $this->arr = $array->toArray();
     }
 
-    public function filter(callable $func = null, $flag = null)
+    public function filter(callable $func = null, string $flag = null): array
     {
         // Default
         if ($func === null) {

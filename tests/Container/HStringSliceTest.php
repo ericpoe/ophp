@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Haystack\Tests\Container;
 
 use Haystack\HString;
@@ -12,12 +14,12 @@ class HStringSliceTest extends TestCase
      * @param HString $target
      * @param HString $expected
      */
-    public function testGetFirstPartOfTypesOfStringUsingSlice(HString $target, $expected)
+    public function testGetFirstPartOfTypesOfStringUsingSlice(HString $target, $expected): void
     {
         $this->assertEquals($expected, $target->slice(0, 4));
     }
 
-    public function providerFirstPartOfTypesOfStringUsingSlice()
+    public function providerFirstPartOfTypesOfStringUsingSlice(): array
     {
         return [
             'String' => [new HString('foobar'), 'foob'],
@@ -32,12 +34,12 @@ class HStringSliceTest extends TestCase
      * @param HString $target
      * @param HString $expected
      */
-    public function testGetLastPartOfTypesOfStringUsingSlice(HString $target, $expected)
+    public function testGetLastPartOfTypesOfStringUsingSlice(HString $target, $expected): void
     {
         $this->assertEquals($expected, $target->slice(-4));
     }
 
-    public function providerLastPartOfTypesOfStringUsingSlice()
+    public function providerLastPartOfTypesOfStringUsingSlice(): array
     {
         return [
             'HString' => [new HString('foobar'), new HString('obar')],
@@ -53,12 +55,12 @@ class HStringSliceTest extends TestCase
      * @param integer $start
      * @param integer $finish
      */
-    public function testGetMiddlePartOfTypesOfStringUsingSlice(HString $target, HString $expected, $start, $finish)
+    public function testGetMiddlePartOfTypesOfStringUsingSlice(HString $target, HString $expected, $start, $finish): void
     {
         $this->assertEquals($expected, $target->slice($start, $finish));
     }
 
-    public function middlePartOfStringProvider()
+    public function middlePartOfStringProvider(): array
     {
         return [
             'ASCII HString: Negative finish, middle' => [new HString('foobar'), new HString('ob'), 2, -2],
@@ -71,40 +73,6 @@ class HStringSliceTest extends TestCase
             'UTF-8 HString: normal middle' => [new HString('ɹɐqooɟ'), new HString('qo'), 2, 2],
             'UTF-8 HString: null finish' => [new HString('ɹɐqooɟ'), new HString('qooɟ'), 2, null],
             'UTF-8 HString: overflow finish' => [new HString('ɹɐqooɟ'), new HString('qooɟ'), 2, 2000],
-        ];
-    }
-
-    /**
-     * @dataProvider badSlicingProvider()
-     *
-     * @param HString $target
-     * @param integer $start
-     * @param integer $length
-     * @param string $exceptionMsg
-     */
-    public function testBadSlicing(HString $target, $start, $length, $exceptionMsg)
-    {
-        $this->expectException('InvalidArgumentException');
-        $this->expectExceptionMessage($exceptionMsg);
-
-        $target->slice($start, $length);
-    }
-
-    public function badSlicingProvider()
-    {
-        return [
-            'ASCII HString: No start or length of slice' =>
-                [new HString('foobar'), null, null, 'Slice parameter 1, $start, must be an integer'],
-            'ASCII HString: Non-integer start of slice' =>
-                [new HString('foobar'), 'cat', 4, 'Slice parameter 1, $start, must be an integer'],
-            'ASCII HString: Non-integer length of slice' =>
-                [new HString('foobar'), '1', 'dog', 'Slice parameter 2, $length, must be null or an integer'],
-            'UTF-8 HString: No start or length of slice' =>
-                [new HString('ɹɐqooɟ'), null, null, 'Slice parameter 1, $start, must be an integer'],
-            'UTF-8 HString: Non-integer start of slice' =>
-                [new HString('ɹɐqooɟ'), 'cat', 4, 'Slice parameter 1, $start, must be an integer'],
-            'UTF-8 HString: Non-integer length of slice' =>
-                [new HString('ɹɐqooɟ'), '1', 'dog', 'Slice parameter 2, $length, must be null or an integer'],
         ];
     }
 }

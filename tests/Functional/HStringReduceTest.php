@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Haystack\Tests\Functional;
 
 use Haystack\HArray;
@@ -10,12 +12,12 @@ class HStringReduceTest extends TestCase
     /** @var HString */
     protected $aString;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->aString = new HString('foobar');
     }
 
-    public function testReduce()
+    public function testReduce(): void
     {
         $fn = function ($carry, $item) {
             $value = (ord(mb_strtolower($item)) - 64);
@@ -25,7 +27,7 @@ class HStringReduceTest extends TestCase
         $this->assertEquals(249, $this->aString->reduce($fn));
     }
 
-    public function testHStringReduce()
+    public function testHStringReduce(): void
     {
         $encode = function ($carry, $item) {
             $value = (ord($item) % 26) + 97;
@@ -50,15 +52,13 @@ class HStringReduceTest extends TestCase
 
     /**
      * @dataProvider stringReduceAsArrayTypeProvider
-     * @param callable $freq
-     * @param string $message
      */
-    public function testStringReduceAsArrayTypeReturnsHArray($freq, $message)
+    public function testStringReduceAsArrayTypeReturnsHArray(callable $freq, string $message): void
     {
         $this->assertInstanceOf(HArray::class, $this->aString->reduce($freq), $message);
     }
 
-    public function stringReduceAsArrayTypeProvider()
+    public function stringReduceAsArrayTypeProvider(): array
     {
         $freqArray = function ($frequency, $letter) {
             if (!isset($frequency[$letter])) {
@@ -103,12 +103,8 @@ class HStringReduceTest extends TestCase
 
     /**
      * @dataProvider stringReduceWithInitialValueProvider
-     *
-     * @param HString $hString
-     * @param mixed $initial
-     * @param mixed $expected
      */
-    public function testStringReduceWithInitialValue(HString $hString, $initial, $expected)
+    public function testStringReduceWithInitialValue(HString $hString, string $initial, string $expected): void
     {
         $what = function ($carry, $item) {
             $carry .= $item;
@@ -119,7 +115,7 @@ class HStringReduceTest extends TestCase
         $this->assertEquals($expected, $hString->reduce($what, $initial));
     }
 
-    public function stringReduceWithInitialValueProvider()
+    public function stringReduceWithInitialValueProvider(): array
     {
         return [
             'Empty HString' => [new HString(), 'alone', 'alone'],

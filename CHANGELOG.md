@@ -3,6 +3,25 @@ All notable changes to this project will be documented in this file.
 This change log follows ideas put forth in [Keep a CHANGELOG](http://keepachangelog.com/).
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.0.0] - 2019-01-29
+
+### Added
+* Both HArray and HString implement a common `HaystackInterface` now
+* Anything that implements `HaystackInterface` can be cast to a `string` and can use `->toString(string $glue='')`
+
+### Updated
+* `HString::toString()` is no longer an alias to `__toString()` since it can now take a `$glue` string as its parameter.
+
+### Changed
+* **BC Break** HArray uses strict typing now
+  * If it's iterable, it can be turned into an HArray
+* **BC Break** HString uses strict typing now
+  * If it's a string, it can be turned into an HString
+* Tests now use strict typing now
+
+### Remove
+* Removed testing support for PHP 5.6, PHP 7.0, and HHVM
+
 ## [2.1.3](https://github.com/ericpoe/haystack/tree/v2.1.3) - 2019-01-29
 
 ### Updated

@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Haystack\Tests\Functional;
 
 use Haystack\HArray;
@@ -8,16 +10,17 @@ class HArrayWalkTest extends TestCase
 {
     /** @var HArray */
     private $arrList;
+
     /** @var HArray */
     private $arrDict;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->arrList = new HArray(['apple', 'bobble', 'cobble', 'dobble']);
         $this->arrDict = new HArray(['a' => 'apple', 'b' => 'bobble', 'c' => 'cobble', 'd' => 'dobble']);
     }
 
-    public function testArrayWalk()
+    public function testArrayWalk(): void
     {
         $capitalizeDict = function ($word, $key) {
             return $this->arrDict[$key] = strtoupper($word);

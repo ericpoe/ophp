@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Haystack\Container;
 
 use Haystack\HArray;
@@ -17,8 +19,8 @@ class HArrayContains
      * @param mixed $value
      * @return bool
      */
-    public function contains($value)
+    public function contains($value): bool
     {
-        return in_array($value, $this->arr->toArray());
+        return in_array($value, $this->arr->toArray(), false);
     }
 }

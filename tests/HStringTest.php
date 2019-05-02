@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Haystack\Tests;
 
 use Haystack\HString;
@@ -12,13 +14,13 @@ class HStringTest extends TestCase
     /** @var  HString */
     protected $utf8String;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->aString = new HString('foobar');
         $this->utf8String = new HString('ɹɐqooɟ');
     }
 
-    public function testCreateEmptyString()
+    public function testCreateEmptyString(): void
     {
         $emptyString = new HString();
         $this->assertEmpty($emptyString);
@@ -28,58 +30,29 @@ class HStringTest extends TestCase
      * @dataProvider stringOfThingsProvider
      *
      * @param mixed $item
-     * @param HString $expected
+     * @param string $expected
      */
-    public function testCreateHStringOfThings($item, $expected)
+    public function testCreateHStringOfThings($item, string $expected):void
     {
         $this->aString = new HString($item);
         $this->assertEquals($expected, $this->aString);
     }
 
-    public function stringOfThingsProvider()
+    public function stringOfThingsProvider(): array
     {
         $timeStamp = new \DateTime();
 
         return [
             'Empty String' => [' ', ' '],
-            'HString' => [new HString('abc'), 'abc'],
-            'HString of HString of HString of...' => [new HString(new HString(new HString(new HString('abc')))), 'abc'],
             'Simple string' => ['abc', 'abc'],
             'UTF-8 string' => ['ɹɐqooɟ', 'ɹɐqooɟ'],
-            'integer 1' => [1, '1'],
-            'integer 0' => [0, '0'],
-            'double 1.1' => [1.1, '1.1'],
             'DateTime formatted timestamp' => [$timeStamp->format('c'), $timeStamp->format('c')],
-            'boolean true' => [true, '1'],
-            'boolean false' => [false, ''],
             'Blank string' => ['', ''],
             'Null string' => [null, ''],
         ];
     }
 
-    /**
-     * @dataProvider createBadHStringProvider
-     *
-     * @param mixed $item
-     * @param string $exceptionMsg
-     */
-    public function testCreateBadHStringOfThings($item, $exceptionMsg)
-    {
-        $this->expectException('ErrorException');
-        $this->expectExceptionMessage($exceptionMsg);
-
-        $this->aString = new HString($item);
-    }
-
-    public function createBadHStringProvider()
-    {
-        return [
-            'DateTime' => [new \DateTime(), 'DateTime is not a proper String'],
-            'SPL Object' => [new \SplDoublyLinkedList(), 'SplDoublyLinkedList is not a proper String'],
-        ];
-    }
-
-    public function testSerialize()
+    public function testSerialize(): void
     {
         $serialized = $this->aString->serialize();
         $this->assertEquals(serialize($this->aString->toString()), $serialized);
@@ -90,24 +63,20 @@ class HStringTest extends TestCase
 
     /**
      * @dataProvider unserializeProvider
-     *
-     * @param string $str
-     * @param HString $expected
      */
-    public function testUnserialize($str, HString $expected)
+    public function testUnserialize(string $str, HString $expected): void
     {
         $this->aString->unserialize($str);
         $this->assertEquals($expected, $this->aString);
     }
 
-    public function unserializeProvider()
+    public function unserializeProvider(): array
     {
         return [
             'String' => [serialize(new HString('foobar')), new HString('foobar')],
             'String with spaces' => [serialize('The quick brown fox jumps'), new HString('The quick brown fox jumps')],
             'UTF-8 string' => [serialize('ɹɐqooɟ'), new HString('ɹɐqooɟ')],
             'Null string' => [serialize(null), new HString()],
-            'Unserialized null string' => [null, new HString()],
         ];
     }
 
@@ -116,7 +85,7 @@ class HStringTest extends TestCase
      * @param mixed $item
      * @param string $exceptionMsg
      */
-    public function testBadUnserialize($item, $exceptionMsg)
+    public function testBadUnserialize($item, string $exceptionMsg): void
     {
         $this->expectException('InvalidArgumentException');
         $this->expectExceptionMessage($exceptionMsg);
@@ -124,7 +93,7 @@ class HStringTest extends TestCase
         $this->aString->unserialize($item);
     }
 
-    public function badUnserializeProvider()
+    public function badUnserializeProvider(): array
     {
         return [
             'Unserialized HString' => [new HString('The quick brown fox'), "HString cannot unserialize a Haystack\\HString"],
@@ -132,7 +101,7 @@ class HStringTest extends TestCase
         ];
     }
 
-    public function testIteratorNext()
+    public function testIteratorNext(): void
     {
         $this->aString->next();
         $this->assertEquals('o', $this->aString->current());
@@ -143,10 +112,8 @@ class HStringTest extends TestCase
 
     /**
      * @dataProvider iteratorValidProvider
-     *
-     * @param HString $toIterate
      */
-    public function testIteratorValid(HString $toIterate)
+    public function testIteratorValid(HString $toIterate): void
     {
         $toIterate->next(); // "o"
         $toIterate->next(); // "o"
@@ -158,7 +125,7 @@ class HStringTest extends TestCase
         $this->assertFalse($toIterate->valid());
     }
 
-    public function iteratorValidProvider()
+    public function iteratorValidProvider(): array
     {
         return [
             'ASCII string to iterate' => [new HString('foobar')],
@@ -168,11 +135,8 @@ class HStringTest extends TestCase
 
     /**
      * @dataProvider iteratorRewindProvider
-     *
-     * @param HString $toRewind
-     * @param integer $expected
      */
-    public function testIteratorRewind(HString $toRewind, $expected)
+    public function testIteratorRewind(HString $toRewind, string $expected): void
     {
         $toRewind->next(); // "o"
         $toRewind->next(); // "o"
@@ -185,7 +149,7 @@ class HStringTest extends TestCase
         $this->assertEquals($expected, $toRewind->current());
     }
 
-    public function iteratorRewindProvider()
+    public function iteratorRewindProvider(): array
     {
         return [
             'ASCII string to iterate' => [new HString('foobar'), 'f'],
@@ -195,11 +159,8 @@ class HStringTest extends TestCase
 
     /**
      * @dataProvider iteratorKeyProvider
-     *
-     * @param HString $toIterate
-     * @param integer $expected
      */
-    public function testIteratorKey(HString $toIterate, $expected)
+    public function testIteratorKey(HString $toIterate, int $expected): void
     {
         $this->assertEquals(0, $toIterate->key());
 
@@ -210,7 +171,7 @@ class HStringTest extends TestCase
         $this->assertEquals($expected, $toIterate->key());
     }
 
-    public function iteratorKeyProvider()
+    public function iteratorKeyProvider(): array
     {
         return [
             'ASCII string to iterate' => [new HString('foobar'), 3],
@@ -220,16 +181,13 @@ class HStringTest extends TestCase
 
     /**
      * @dataProvider arrayStyleCountProvider
-     *
-     * @param HString $toCount
-     * @param integer $expected
      */
-    public function testArrayStyleCount(HString $toCount, $expected)
+    public function testArrayStyleCount(HString $toCount, int $expected): void
     {
         $this->assertEquals($expected, $toCount->count());
     }
 
-    public function arrayStyleCountProvider()
+    public function arrayStyleCountProvider(): array
     {
         return [
             'ASCII string to iterate' => [new HString('foobar'), 6],
@@ -239,10 +197,8 @@ class HStringTest extends TestCase
 
     /**
      * @dataProvider arrayStyleOffsetExistsProvider
-     *
-     * @param HString $stringToTest
      */
-    public function testArrayStyleOffsetExists(HString $stringToTest)
+    public function testArrayStyleOffsetExists(HString $stringToTest): void
     {
         $expectedLastOffset = $stringToTest->count() - 1;
 
@@ -250,7 +206,7 @@ class HStringTest extends TestCase
         $this->assertFalse(isset($stringToTest[$expectedLastOffset + 1]));
     }
 
-    public function arrayStyleOffsetExistsProvider()
+    public function arrayStyleOffsetExistsProvider(): array
     {
         return [
             'ASCII string to iterate' => [new HString('foobar')],
@@ -260,17 +216,13 @@ class HStringTest extends TestCase
 
     /**
      * @dataProvider arrayStyleOffsetGetProvider
-     *
-     * @param HString $stringToTest
-     * @param integer $offset
-     * @param string $expected
      */
-    public function testArrayStyleOffsetGet(HString $stringToTest, $offset, $expected)
+    public function testArrayStyleOffsetGet(HString $stringToTest, int $offset, string $expected): void
     {
         $this->assertEquals($expected, $stringToTest[$offset]);
     }
 
-    public function arrayStyleOffsetGetProvider()
+    public function arrayStyleOffsetGetProvider(): array
     {
         return [
             'ASCII string to iterate' => [new HString('foobar'), 3, 'b'],
@@ -280,19 +232,14 @@ class HStringTest extends TestCase
 
     /**
      * @dataProvider arrayStyleOffsetSetProvider
-     *
-     * @param HString $stringToTest
-     * @param integer $offset
-     * @param string $char
-     * @param HString $expected
      */
-    public function testArrayStyleOffsetSet(HString $stringToTest, $offset, $char, $expected)
+    public function testArrayStyleOffsetSet(HString $stringToTest, int $offset, string $char, HString $expected): void
     {
         $stringToTest[$offset] = $char;
         $this->assertEquals($expected, $stringToTest);
     }
 
-    public function arrayStyleOffsetSetProvider()
+    public function arrayStyleOffsetSetProvider(): array
     {
         return [
             'ASCII string to iterate' => [new HString('foobar'), 0, 'r', new HString('roobar')],
@@ -300,51 +247,50 @@ class HStringTest extends TestCase
         ];
     }
 
-    public function testArrayStyleOffsetUnset()
+    public function testArrayStyleOffsetUnset(): void
     {
         unset($this->utf8String[3]);
-        $this->assertEquals(chr(0x00), $this->utf8String[3]); // binary null
+
+        $binaryNull = chr(0x00);
+        $this->assertEquals($binaryNull, $this->utf8String[3]);
     }
 
-    public function testArrayStyleAccess()
+    public function testArrayStyleAccess(): void
     {
         $this->assertEquals('o', $this->aString[1]);
         $this->assertEquals('ɐ', $this->utf8String[1]);
     }
 
-    public function testStringHead()
+    public function testStringHead(): void
     {
-        $this->assertEquals('f', $this->aString->head()->toString());
-        $this->assertEquals('ɹ', $this->utf8String->head()->toString());
+        $this->assertEquals('f', (string) $this->aString->head());
+        $this->assertEquals('ɹ', (string ) $this->utf8String->head());
 
         $emptyString = new HString();
-        $this->assertEmpty(sprintf($emptyString->head()));
+        $this->assertEmpty((string) $emptyString->head());
     }
 
-    public function testStringTail()
+    public function testStringTail(): void
     {
-        $this->assertEquals('oobar', $this->aString->tail()->toString());
+        $this->assertEquals('oobar', (string) $this->aString->tail());
 
         $emptyString = new HString();
-        $this->assertEmpty(sprintf($emptyString->tail()));
+        $this->assertEmpty((string) $emptyString->tail());
     }
 
     /**
      * @dataProvider sumStringProvider
-     *
-     * @param HString $hString
-     * @param int|float $expected
      */
-    public function testStringSum(HString $hString, $expected)
+    public function testStringSum(HString $hString, float $expected): void
     {
         $this->assertEquals($expected, $hString->sum());
     }
 
-    public function sumStringProvider()
+    public function sumStringProvider(): array
     {
         return [
             'Empty HString' => [new HString(), 0],
-            'HString of chars' => [new HString($this->aString), 0],
+            'HString of chars' => [new HString((string) $this->aString), 0],
             'HString of chars & spaces' => [new HString('foo bar baz'), 0],
             'HString of comma-delimited ints' => [new HString('1, 2, 3, 4, 5, 6, 7, 8, 9, 10'), 55],
             'HString of comma-delimited ints & doubles' => [new HString('1.1, 2, 3, 4, 5, 6, 7, 8, 9, 10'), 55.1],
@@ -353,20 +299,17 @@ class HStringTest extends TestCase
 
     /**
      * @dataProvider productStringProvider
-     *
-     * @param HString $hString
-     * @param int|float $expected
      */
-    public function testStringProvider(HString $hString, $expected)
+    public function testStringProduct(HString $hString, float $expected): void
     {
         $this->assertEquals($expected, $hString->product());
     }
 
-    public function productStringProvider()
+    public function productStringProvider(): array
     {
         return [
             'Empty HString' => [new HString(), 0],
-            'HString of chars' => [new HString($this->aString), 0],
+            'HString of chars' => [new HString((string) $this->aString), 0],
             'HString of chars & spaces' => [new HString('foo bar baz'), 0],
             'HString of chars & ints' => [new HString('1, 2, 3, 4, 5, 6, 7, 8, 9, 10, apple'), 0],
             'HString of comma-delimited ints' => [new HString('1, 2, 3, 4, 5, 6, 7, 8, 9, 10'), 3628800],

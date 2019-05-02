@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Haystack\Tests\Functional;
 
 use Haystack\HArray;
@@ -9,10 +11,11 @@ class HArrayReduceTest extends TestCase
 {
     /** @var HArray */
     private $arrList;
+
     /** @var HArray */
     private $arrDict;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->arrList = new HArray(['apple', 'bobble', 'cobble', 'dobble']);
         $this->arrDict = new HArray(['a' => 'apple', 'b' => 'bobble', 'c' => 'cobble', 'd' => 'dobble']);
@@ -20,11 +23,8 @@ class HArrayReduceTest extends TestCase
 
     /**
      * @dataProvider arrayReduceProvider
-     *
-     * @param HArray    $testArr
-     * @param int       $expected
      */
-    public function testArrayReduce(HArray $testArr, $expected)
+    public function testArrayReduce(HArray $testArr, int $expected): void
     {
         $sum = function ($carry, $item) {
             $carry += (int) $item;
@@ -34,7 +34,7 @@ class HArrayReduceTest extends TestCase
         $this->assertEquals($expected, $testArr->reduce($sum));
     }
 
-    public function arrayReduceProvider()
+    public function arrayReduceProvider(): array
     {
         return [
             'Empty Array' => [new HArray(), 0],
@@ -51,12 +51,8 @@ class HArrayReduceTest extends TestCase
 
     /**
      * @dataProvider arrayReduceWithInitProvider
-     *
-     * @param HArray       $testArr
-     * @param int          $init
-     * @param int          $expected
      */
-    public function testArrayReduceWithInit(HArray $testArr, $init, $expected)
+    public function testArrayReduceWithInit(HArray $testArr, int $init, int $expected): void
     {
         $sum = function ($carry, $item) {
             $carry += $item;
@@ -66,7 +62,7 @@ class HArrayReduceTest extends TestCase
         $this->assertEquals($expected, $testArr->reduce($sum, $init));
     }
 
-    public function arrayReduceWithInitProvider()
+    public function arrayReduceWithInitProvider(): array
     {
         $fullArr = new HArray([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
         return [
@@ -79,16 +75,14 @@ class HArrayReduceTest extends TestCase
 
     /**
      * @dataProvider reduceAsArrayTypeProvider
-     *
-     * @param callable $freq
      */
-    public function testReduceAsArrayType($freq)
+    public function testReduceAsArrayType(callable $freq): void
     {
         $this->assertInstanceOf(HArray::class, $this->arrList->reduce($freq));
         $this->assertInstanceOf(HArray::class, $this->arrDict->reduce($freq));
     }
 
-    public function reduceAsArrayTypeProvider()
+    public function reduceAsArrayTypeProvider(): array
     {
         $freqArray = function ($frequency, $letter) {
             if (!isset($frequency[$letter])) {
@@ -131,14 +125,14 @@ class HArrayReduceTest extends TestCase
         ];
     }
 
-    public function testReduceAsString()
+    public function testReduceAsString(): void
     {
         $toString = function ($sentence, $word) {
             return sprintf('%s%s ', $sentence, $word);
         };
 
-        $this->assertEquals(new HString('apple bobble cobble dobble'), trim($this->arrList->reduce($toString)));
-        $this->assertEquals(new HString('apple bobble cobble dobble'), trim($this->arrDict->reduce($toString)));
+        $this->assertEquals(new HString('apple bobble cobble dobble'), trim((string) $this->arrList->reduce($toString)));
+        $this->assertEquals(new HString('apple bobble cobble dobble'), trim((string) $this->arrDict->reduce($toString)));
         $this->assertInstanceOf(HString::class, $this->arrList->reduce($toString));
         $this->assertInstanceOf(HString::class, $this->arrDict->reduce($toString));
     }

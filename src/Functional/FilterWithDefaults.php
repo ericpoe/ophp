@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Haystack\Functional;
 
 use Haystack\Helpers\Helper;
@@ -8,18 +10,12 @@ class FilterWithDefaults
     /** @var array*/
     protected $arr;
 
-    /**
-     * @param array $arr
-     */
     public function __construct(array $arr)
     {
         $this->arr = $arr;
     }
 
-    /**
-     * @return array
-     */
-    public function filter()
+    public function filter(): array
     {
         $filtered = array_filter($this->arr);
 

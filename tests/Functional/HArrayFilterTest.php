@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Haystack\Tests\Functional;
 
 use Haystack\HArray;
@@ -7,19 +9,19 @@ use PHPUnit\Framework\TestCase;
 
 class HArrayFilterTest extends TestCase
 {
-    /** @var  \Haystack\HArray */
+    /** @var HArray */
     private $arrList;
 
-    /** @var  \Haystack\HArray */
+    /** @var HArray */
     private $arrDict;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->arrList = new HArray(['apple', 'bobble', 'cobble', 'dobble']);
         $this->arrDict = new HArray(['a' => 'apple', 'b' => 'bobble', 'c' => 'cobble', 'd' => 'dobble']);
     }
 
-    public function testArrayDefaultFilter()
+    public function testArrayDefaultFilter(): void
     {
         $this->arrList = $this->arrList->insert(0, 2);
         $this->assertEquals(new HArray(['apple', 'bobble', 'cobble', 'dobble']), $this->arrList->filter(), 'List - Default Filter');
@@ -27,7 +29,7 @@ class HArrayFilterTest extends TestCase
 
     }
 
-    public function testArrayWithValueFilter()
+    public function testArrayWithValueFilter(): void
     {
         $vowel = function ($word) {
             $vowels = new HString('aeiou');
@@ -39,7 +41,7 @@ class HArrayFilterTest extends TestCase
         $this->assertEquals(new HArray(['a' => 'apple']), $this->arrDict->filter($vowel), 'Dict - Value Filter');
     }
 
-    public function testArrayWithKeyFilter()
+    public function testArrayWithKeyFilter(): void
     {
         $vowelKey = function ($key) {
             $vowels = new HString('aeoiu');
@@ -52,7 +54,7 @@ class HArrayFilterTest extends TestCase
         $this->assertEquals(new HArray(['a' => 'bobble']), $arr->filter($vowelKey, $flag), 'Dict - Key Filter');
     }
 
-    public function testArrayWithArrayAndKeyFilter()
+    public function testArrayWithArrayAndKeyFilter(): void
     {
         $vowel_both = function ($value, $key) {
             $vowels = new HString('aeiou');
@@ -69,7 +71,7 @@ class HArrayFilterTest extends TestCase
         $this->assertEquals(new HArray(['b' => 'apple', 'a' => 'bobble']), $arr->filter($vowel_both, $flag), 'Dict - Value & Key Filter');
     }
 
-    public function testBadArrayFilterFlag()
+    public function testBadArrayFilterFlag(): void
     {
         $vowel = function ($word) {
             $vowels = new HString('aeiou');

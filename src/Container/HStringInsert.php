@@ -1,7 +1,6 @@
 <?php
 namespace Haystack\Container;
 
-use Haystack\Helpers\Helper;
 use Haystack\HString;
 
 class HStringInsert
@@ -14,36 +13,32 @@ class HStringInsert
         $this->hString = $hString;
     }
 
-    public function insert($value, $key = null)
+    public function insert(string $value, ?int $key = null): string
     {
-        if (is_scalar($value) || $value instanceof HString) {
-            if ($key === null) {
-                $key = $this->hString->count();
-            } elseif (is_numeric($key)) {
-                $key = (int) $key;
-            } else {
-                throw new \InvalidArgumentException('Invalid array key');
-            }
-
-            return $this->getPrefix($key). $value . $this->getSuffix($key);
+        if ($key === null) {
+            return $this->buildString($value, $this->hString->count());
         }
 
-        throw new \InvalidArgumentException(sprintf('Cannot insert %s into an HString', Helper::getType($value)));
+        return $this->buildString($value, $key);
     }
 
-    private function getPrefix($key)
+    private function buildString(string $value, int $key): string
+    {
+        return sprintf('%s%s%s', $this->getPrefix($key), $value, $this->getSuffix($key));
+    }
+
+    private function getPrefix(int $key): string
     {
         $length = $key >= 0 ? $key: $this->hString->count() - 1;
 
         return mb_substr($this->hString, 0, $length, $this->hString->getEncoding());
     }
 
-    private function getSuffix($key)
+    private function getSuffix(int $key): string
     {
         $start = $key >= 0 ? $key : $this->hString->count() + $key;
         $length = $key >= 0 ? $this->hString->count() : $this->hString->count() + $key;
 
         return mb_substr($this->hString, $start, $length, $this->hString->getEncoding());
     }
-
 }

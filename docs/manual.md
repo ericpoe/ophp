@@ -21,7 +21,7 @@ $myArray = (new HArray($existingArray))->insert("orange", "o");
 
 ## Requirements
 
-* PHP >= 5.6
+* PHP >= 7.1
 * [composer](http://getcomposer.org)
 
 ## Main Classes of Haystack

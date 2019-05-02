@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Haystack\Tests\Container;
 
 use Haystack\HArray;
@@ -9,10 +11,11 @@ class HArrayInsertTest extends TestCase
 {
     /** @var HArray */
     private $arrList;
+
     /** @var HArray */
     private $arrDict;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->arrList = new HArray(['apple', 'bobble', 'cobble', 'dobble']);
         $this->arrDict = new HArray(['a' => 'apple', 'b' => 'bobble', 'c' => 'cobble', 'd' => 'dobble']);
@@ -25,7 +28,7 @@ class HArrayInsertTest extends TestCase
      * @param null|int $key
      * @param HArray $expected
      */
-    public function testTypesOfArrayInsert($type, $babyArray, $key, $expected)
+    public function testTypesOfArrayInsert(string $type, $babyArray, $key, HArray $expected): void
     {
         if ('list' === $type) {
             $newString = $this->arrList->insert($babyArray, $key);
@@ -36,7 +39,7 @@ class HArrayInsertTest extends TestCase
         $this->assertEquals($expected, $newString);
     }
 
-    public function arrayInsertProvider()
+    public function arrayInsertProvider(): array
     {
         return [
             'List: Int at end' => ['list', 5, null, new HArray(['apple', 'bobble', 'cobble', 'dobble', 5])],
@@ -54,7 +57,7 @@ class HArrayInsertTest extends TestCase
         ];
     }
 
-    public function testInsertObjects()
+    public function testInsertObjects(): void
     {
         $object1 = new \DateTime();
         $arrList = $this->arrList->insert($object1);
@@ -68,7 +71,7 @@ class HArrayInsertTest extends TestCase
      * @param object $key
      * @param string $exceptionMsg
      */
-    public function testObjectCannotBeUsedAsArrayKey($key, $exceptionMsg)
+    public function testObjectCannotBeUsedAsArrayKey($key, string $exceptionMsg): void
     {
         $this->expectException('InvalidArgumentException');
         $this->expectExceptionMessage($exceptionMsg);
@@ -76,7 +79,7 @@ class HArrayInsertTest extends TestCase
         $this->arrDict->insert('yobbo', $key);
     }
 
-    public function badInsertKeyProvider()
+    public function badInsertKeyProvider(): array
     {
         return [
             'DateTime' => [new \DateTime(), 'Invalid array key'],

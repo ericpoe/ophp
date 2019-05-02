@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Haystack\Functional;
 
 use Haystack\HArray;
@@ -23,7 +25,7 @@ class HaystackReduce
     {
         $reduced = array_reduce($this->arr, $func, $initial);
 
-        if ($reduced instanceof \ArrayObject || is_array($reduced)) {
+        if (is_iterable($reduced)) {
             return new HArray($reduced);
         }
 

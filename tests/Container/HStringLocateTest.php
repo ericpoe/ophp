@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Haystack\Tests\Container;
 
 use Haystack\Container\ElementNotFoundException;
@@ -11,16 +13,17 @@ class HStringLocateTest extends TestCase
      * @dataProvider stringLocateProvider()
      *
      * @param HString $target
-     * @param string | HString $checkString
-     * @param integer $expected
+     * @param int $expected
+     * @throws ElementNotFoundException
      */
-    public function testLocateTypesOfStringInFoobar(HString $target, $checkString, $expected)
+    public function testLocateTypesOfStringInFoobar(HString $target, $checkString, int $expected): void
     {
+        $checkString = $checkString instanceof HString ? (string) $checkString : $checkString;
         $var = $target->locate($checkString);
         $this->assertEquals($expected, $var);
     }
 
-    public function stringLocateProvider()
+    public function stringLocateProvider(): array
     {
         $aString = new HString('foobar');
         $utf8String = new HString('ɹɐqooɟ');
@@ -33,27 +36,33 @@ class HStringLocateTest extends TestCase
         ];
     }
 
-    public function testObjectWithString()
+    public function testObjectWithString(): void
     {
         $date = new \DateTime('now');
         $timeStamp = $date->format('c');
         $timeSentence = new HString(sprintf('I have %s in me.', $timeStamp));
         $this->assertEquals(7, $timeSentence->locate($date->format('c')));
 
-        // This would be a good use of a PHP7 anonymous class
-        $obj = new ObjWithToString();
+        $obj = new class() {
+            public function __toString(): string
+            {
+                return sprintf("I'm a string");
+            }
+        };
+
         $sampleString = "I'm a string";
         $objSentence = new HString(sprintf('I have %s in me.', $sampleString));
-        $this->assertEquals(7, $objSentence->locate($obj));
+        $this->assertEquals(7, $objSentence->locate((string) $obj));
     }
 
     /**
      * @dataProvider stringBadLocateProvider()
      *
-     * @param mixed $checkString
+     * @param HString $checkString
      * @param string $message
+     * @throws ElementNotFoundException
      */
-    public function testCannotLocateTypesOfStringInFoober($checkString, $message)
+    public function testCannotLocateTypesOfStringInFoober($checkString, string $message): void
     {
         $this->expectException(ElementNotFoundException::class);
         $this->expectExceptionMessage($message);
@@ -61,23 +70,24 @@ class HStringLocateTest extends TestCase
         (new HString('foobar'))->locate($checkString);
     }
 
-    public function stringBadLocateProvider()
+    public function stringBadLocateProvider(): array
     {
         return [
             'String known-missing' => ['baz', 'Element could not be found: baz'],
             'HString known-missing' => [new HString('baz'), 'Element could not be found: baz'],
             'Integer known-missing' => [42, 'Element could not be found: 42'],
-            'HString integer known-missing' => [new HString(42), 'Element could not be found: 42'],
+            'HString integer known-missing' => [new HString('42'), 'Element could not be found: 42'],
         ];
     }
 
     /**
      * @dataProvider badLocateTypesOfStringInFoobarProvider
-     * @param object $item
+     *
+     * @param HString $item
      * @param string $exceptionMsg
-     * @throws \InvalidArgumentException
+     * @throws ElementNotFoundException
      */
-    public function testBadLocateTypesOfStringInFoobar($item, $exceptionMsg)
+    public function testBadLocateTypesOfStringInFoobar($item, string $exceptionMsg): void
     {
         $this->expectException('InvalidArgumentException');
         $this->expectExceptionMessage($exceptionMsg);
@@ -85,7 +95,7 @@ class HStringLocateTest extends TestCase
         (new HString('foobar'))->locate($item);
     }
 
-    public function badLocateTypesOfStringInFoobarProvider()
+    public function badLocateTypesOfStringInFoobarProvider(): array
     {
         return [
             'DateTime' => [

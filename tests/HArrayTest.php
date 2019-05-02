@@ -1,7 +1,10 @@
 <?php
+declare(strict_types=1);
+
 namespace Haystack\Tests;
 
 use Haystack\HArray;
+use Haystack\HaystackInterface;
 use Haystack\HString;
 use PHPUnit\Framework\TestCase;
 
@@ -16,14 +19,14 @@ class HArrayTest extends TestCase
     /** @var HArray */
     private $arrUtf8Dict;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->arrList = new HArray(['apple', 'bobble', 'cobble', 'dobble']);
         $this->arrDict = new HArray(['a' => 'apple', 'b' => 'bobble', 'c' => 'cobble', 'd' => 'dobble']);
         $this->arrUtf8Dict = new HArray(['ɐ' => 'ǝlddɐ', 'q' => 'ǝlqqoq', 'ɔ' => 'ǝlqqoɔ', 'p' => 'ǝlqqop']);
     }
 
-    public function testCreateEmptyArray()
+    public function testCreateEmptyArray(): void
     {
         $array = new HArray();
         $this->assertEmpty($array);
@@ -35,46 +38,38 @@ class HArrayTest extends TestCase
 
     /**
      * @dataProvider goodArraysProvider
-     *
-     * @param array $item
      */
-    public function testCreateArrayOfThings($item)
+    public function testCreateArrayOfThings(iterable $item): void
     {
         $goodArr = new HArray($item);
         $this->assertArrayHasKey(0, $goodArr->toArray());
     }
 
-    public function goodArraysProvider()
+    public function goodArraysProvider(): array
     {
         return [
-            'bool: true' => [true],
-            'bool: false' => [false],
-            'integer' => [5],
-            'integer: 0' => [0],
-            'array' => [1, 2, 3],
+            'array' => [[1, 2, 3]],
             'ArrayObject' => [new \ArrayObject([0, 1, 2])],
-            'DateTime' => [new \DateTime()],
-            'string' => ['a'],
             'HString' => [new HString('a string')],
-            'HString of HString of ... ' => [new HString(new HString(new HString(new HString('a string'))))],
+            'HString of HString of ... ' => [new HString((string) new HString((string) new HString((string) new HString('a string'))))],
         ];
     }
 
-    public function testArrayStyleAccess()
+    public function testArrayStyleAccess(): void
     {
         $this->assertEquals('bobble', $this->arrList[1]);
         $this->assertEquals('bobble', $this->arrDict['b']);
         $this->assertEquals('ǝlqqoq', $this->arrUtf8Dict['q']);
     }
 
-    public function testArrayHead()
+    public function testArrayHead(): void
     {
         $this->assertEquals(new HArray(['apple']), $this->arrList->head());
         $this->assertEquals(new HArray(['a' => 'apple']), $this->arrDict->head());
         $this->assertEquals(new HArray(['ɐ' => 'ǝlddɐ']), $this->arrUtf8Dict->head());
     }
 
-    public function testArrayTail()
+    public function testArrayTail(): void
     {
         $this->assertEquals(new HArray(['bobble', 'cobble', 'dobble']), $this->arrList->tail());
         $this->assertEquals(new HArray(['b' => 'bobble', 'c' => 'cobble', 'd' => 'dobble']), $this->arrDict->tail());
@@ -82,16 +77,13 @@ class HArrayTest extends TestCase
 
     /**
      * @dataProvider arraySumProvider
-     *
-     * @param \Haystack\HArray $testArr
-     * @param int $expected
      */
-    public function testArraySum(HArray $testArr, $expected)
+    public function testArraySum(HArray $testArr, int $expected): void
     {
         $this->assertEquals($expected, $testArr->sum());
     }
 
-    public function arraySumProvider()
+    public function arraySumProvider(): array
     {
         return [
             'Empty HArray' => [new HArray(), 0],
@@ -107,16 +99,13 @@ class HArrayTest extends TestCase
 
     /**
      * @dataProvider arrayProductProvider()
-     *
-     * @param \Haystack\HArray $testArr
-     * @param int $expected
      */
-    public function testArrayProduct(HArray $testArr, $expected)
+    public function testArrayProduct(HaystackInterface $testArr, int $expected): void
     {
         $this->assertEquals($expected, $testArr->product());
     }
 
-    public function arrayProductProvider()
+    public function arrayProductProvider(): array
     {
         return [
             'Empty HArray' => [new HArray(), 0],

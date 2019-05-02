@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Haystack\Tests\Container;
 
 use Haystack\HString;
@@ -9,17 +11,17 @@ class HStringContainsTest extends TestCase
     /**
      * @dataProvider stringContainsProvider
      *
-     * @param string|HString $target
+     * @param HString $target
      * @param string|HString $checkString
      * @param bool $expectedBool
      */
-    public function testTypesOfStringInFoobar($target, $checkString, $expectedBool)
+    public function testTypesOfStringInFoobar(HString $target, $checkString, bool $expectedBool): void
     {
         $var = $target->contains($checkString);
         $expectedBool ? $this->assertTrue($var) : $this->assertFalse($var);
     }
 
-    public function stringContainsProvider()
+    public function stringContainsProvider(): array
     {
         $aString = new HString('foobar');
         $utf8String = new HString('ɹɐqooɟ');
@@ -45,27 +47,32 @@ class HStringContainsTest extends TestCase
         ];
     }
 
-    public function testObjectWithString()
+    public function testObjectWithString(): void
     {
         $date = new \DateTime('now');
         $timeStamp = $date->format('c');
         $timeSentence = new HString(sprintf('I have %s in me.', $timeStamp));
         $this->assertTrue($timeSentence->contains($date->format('c')));
 
-        // This would be a good use of a PHP7 anonymous class
-        $obj = new ObjWithToString();
+        $obj = new class() {
+            public function __toString(): string
+            {
+                return sprintf("I'm a string");
+            }
+        };
+
         $sampleString = "I'm a string";
         $objSentence = new HString(sprintf('I have %s in me.', $sampleString));
-        $this->assertTrue($objSentence->contains($obj));
+        $this->assertTrue($objSentence->contains((string) $obj));
     }
 
     /**
      * @dataProvider badTypesOfStringInFoobar
-     * @param object $item
+     * @param HString $item
      * @param string $exceptionMsg
      * @throws \InvalidArgumentException
      */
-    public function testBadTypesOfStringInFoobar($item, $exceptionMsg)
+    public function testBadTypesOfStringInFoobar($item, string $exceptionMsg): void
     {
         $this->expectException('InvalidArgumentException');
         $this->expectExceptionMessage($exceptionMsg);
@@ -73,7 +80,7 @@ class HStringContainsTest extends TestCase
         (new HString('foobar'))->contains($item);
     }
 
-    public function badTypesOfStringInFoobar()
+    public function badTypesOfStringInFoobar(): array
     {
         return [
             'DateTime' => [

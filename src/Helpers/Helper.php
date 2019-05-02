@@ -1,11 +1,13 @@
 <?php
+declare(strict_types=1);
+
 namespace Haystack\Helpers;
 
 use Haystack\HString;
 
 class Helper
 {
-    public static function getType($thing)
+    public static function getType($thing): string
     {
         if (is_object($thing)) {
             return get_class($thing);
@@ -18,19 +20,13 @@ class Helper
      * Determines if an array is associative or not
      *
      * @link http://stackoverflow.com/questions/173400
-     * @param array $array
-     * @return bool
      */
-    public static function isAssociativeArray(array $array)
+    public static function isAssociativeArray(array $array): bool
     {
         return (bool)count(array_filter(array_keys($array), 'is_string'));
     }
 
-    /**
-     * @param mixed $thing
-     * @return bool
-     */
-    public static function canBeInArray($thing)
+    public static function canBeInArray($thing): bool
     {
         $possibility = is_array($thing)
             || is_scalar($thing)

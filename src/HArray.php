@@ -1,8 +1,8 @@
 <?php
+declare(strict_types=1);
+
 namespace Haystack;
 
-use Haystack\Container\ContainerInterface;
-use Haystack\Container\ElementNotFoundException;
 use Haystack\Container\HArrayAppend;
 use Haystack\Container\HArrayContains;
 use Haystack\Container\HArrayInsert;
@@ -11,70 +11,67 @@ use Haystack\Container\HArrayRemove;
 use Haystack\Container\HArraySlice;
 use Haystack\Converter\ArrayToString;
 use Haystack\Functional\Filter;
-use Haystack\Functional\FunctionalInterface;
 use Haystack\Functional\HArrayWalk;
 use Haystack\Functional\HaystackMap;
 use Haystack\Functional\HaystackReduce;
-use Haystack\Math\MathInterface;
 
-class HArray extends \ArrayObject implements ContainerInterface, FunctionalInterface, MathInterface
+class HArray extends \ArrayObject implements HaystackInterface
 {
-    const USE_KEY = 'key';
-    const USE_BOTH = 'both';
+    public const USE_KEY = 'key';
+    public const USE_BOTH = 'both';
 
     /** @var array */
     protected $arr;
 
-    /**
-     * @param null|array|object|\ArrayObject|HString|bool|int|float|string $arr
-     */
-    public function __construct($arr = [])
+    public function __construct(?iterable $arr = [])
     {
         if ($arr instanceof \ArrayObject) {
             $arr = $arr->getArrayCopy();
         }
 
         if ($arr instanceof HString) {
-            $arr = [$arr->toString()];
+            $arr = $arr->toArray();
         }
 
-        if (is_scalar($arr) || is_object($arr)) {
-            parent::__construct([$arr]);
-            $this->arr = [$arr];
-        } else {
-            parent::__construct((array) $arr);
-            $this->arr = (array) $arr;
-        }
+        parent::__construct((array) $arr);
+        $this->arr = (array) $arr;
     }
 
-    public function toArray()
+    public function __toString(): string
+    {
+        $str = new ArrayToString($this->arr);
+
+        return $str->toString();
+    }
+
+    public function toString(?string $glue = ''): string
+    {
+        $str = new ArrayToString($this->arr, (string) $glue);
+
+        return $str->toString();
+
+    }
+
+
+    public function toArray(): array
     {
         return $this->arr;
     }
 
     /**
      * Alias to PHP function `implode`
-     *
-     * @param string $glue - defaults to an empty string
-     * @return HString
      */
-    public function toHString($glue = '')
+    public function toHString(?string $glue = ''): HString
     {
-        if (empty($this->arr)) {
-            return new HString();
-        }
+        $str = new ArrayToString($this->arr, (string) $glue);
 
-        $str = new ArrayToString($this->arr, $glue);
         return new HString($str->toString());
     }
 
     /**
      * @inheritdoc
-     *
-     * @param mixed $value
-     * @return boolean
      */
-    public function contains($value)
+    public function contains($value): bool
     {
         $answer = new HArrayContains($this);
         return $answer->contains($value);
@@ -82,24 +79,22 @@ class HArray extends \ArrayObject implements ContainerInterface, FunctionalInter
 
     /**
      * @inheritdoc
-     *
-     * @param mixed $value
-     * @return int|string - array-notation location of $value in current object; "-1" if not found
-     * @throws ElementNotFoundException
      */
     public function locate($value)
     {
         $answer = new HArrayLocate($this);
+
+        if ($value instanceof HString) {
+            $value = (string) $value;
+        }
+
         return $answer->locate($value);
     }
 
     /**
      * @inheritdoc
-     *
-     * @param mixed $value
-     * @return HArray
      */
-    public function append($value)
+    public function append($value): HaystackInterface
     {
         $answer = new HArrayAppend($this->toArray());
         return new static($answer->append($value));
@@ -107,14 +102,8 @@ class HArray extends \ArrayObject implements ContainerInterface, FunctionalInter
 
     /**
      * @inheritdoc
-     *
-     * @param mixed    $value
-     * @param int|null $key
-     * @return HArray
-     *
-     * @throws \InvalidArgumentException
      */
-    public function insert($value, $key = null)
+    public function insert($value, $key = null): HaystackInterface
     {
         $answer = new HArrayInsert($this);
         return new static($answer->insert($value, $key));
@@ -123,11 +112,8 @@ class HArray extends \ArrayObject implements ContainerInterface, FunctionalInter
 
     /**
      * @inheritdoc
-     *
-     * @param mixed $value
-     * @return HArray
      */
-    public function remove($value)
+    public function remove($value): HaystackInterface
     {
         $answer = new HArrayRemove($this);
         return new static($answer->remove($value));
@@ -135,13 +121,8 @@ class HArray extends \ArrayObject implements ContainerInterface, FunctionalInter
 
     /**
      * @inheritdoc
-     *
-     * @param int $start
-     * @param int $length
-     * @return HArray
-     * @throws \InvalidArgumentException
      */
-    public function slice($start, $length = null)
+    public function slice(int $start, ?int $length = null): HaystackInterface
     {
         $answer = new HArraySlice($this);
         return new static($answer->slice($start, $length));
@@ -149,11 +130,8 @@ class HArray extends \ArrayObject implements ContainerInterface, FunctionalInter
 
     /**
      * @inheritdoc
-     *
-     * @param callable $func
-     * @return HArray
      */
-    public function map(callable $func)
+    public function map(callable $func): HaystackInterface
     {
         $containers = array_slice(func_get_args(), 1); // remove `$func`
 
@@ -166,30 +144,16 @@ class HArray extends \ArrayObject implements ContainerInterface, FunctionalInter
 
     /**
      * @inheritdoc
-     *
-     * @param callable $func
-     * @return null
      */
-    public function walk(callable $func)
+    public function walk(callable $func): void
     {
         HArrayWalk::walk($this->arr, $func);
     }
 
     /**
      * @inheritdoc
-     *
-     * @param callable $func   - If no callback is supplied, all entries of container equal to FALSE will be removed.
-     * @param null     $flag   - Flag determining what arguments are sent to callback
-     *                             - USE_KEY
-     *                                 - pass key as the only argument to callback instead of the value
-     *                             - USE_BOTH
-     *                                 - pass both value and key as arguments to callback instead of the value
-     *
-     * @return HArray
-     *
-     * @throws \InvalidArgumentException
      */
-    public function filter(callable $func = null, $flag = null)
+    public function filter(callable $func = null, ?string $flag = null): HaystackInterface
     {
         $answer = new Filter($this);
         return new static($answer->filter($func, $flag));
@@ -197,10 +161,6 @@ class HArray extends \ArrayObject implements ContainerInterface, FunctionalInter
 
     /**
      * @inheritdoc
-     *
-     * @param callable $func
-     * @param mixed|null $initial
-     * @return bool|float|int|HString|HArray
      */
     public function reduce(callable $func, $initial = null)
     {
@@ -210,40 +170,32 @@ class HArray extends \ArrayObject implements ContainerInterface, FunctionalInter
 
     /**
      * @inheritdoc
-     *
-     * @return HArray
      */
-    public function head()
+    public function head(): HaystackInterface
     {
         return $this->slice(0, 1);
     }
 
     /**
      * @inheritdoc
-     *
-     * @return HArray
      */
-    public function tail()
+    public function tail(): HaystackInterface
     {
         return $this->slice(1);
     }
 
     /**
      * @inheritdoc
-     *
-     * @return number
      */
-    public function sum()
+    public function sum(): float
     {
         return array_sum($this->arr);
     }
 
     /**
      * @inheritdoc
-     *
-     * @return int|number
      */
-    public function product()
+    public function product(): float
     {
         if (empty($this->arr)) {
             return 0;

@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Haystack\Tests\Container;
 
 use Haystack\Container\ElementNotFoundException;
@@ -26,8 +28,9 @@ class HArrayLocateTest extends TestCase
      * @param string $type
      * @param string|HString $checkThing
      * @param int|string $expected
+     * @throws ElementNotFoundException
      */
-    public function testLocateStringTypeInHArray($type, $checkThing, $expected)
+    public function testLocateStringTypeInHArray(string $type, $checkThing, $expected): void
     {
         if ('list' === $type) {
             $var = $this->arrList->locate($checkThing);
@@ -38,7 +41,7 @@ class HArrayLocateTest extends TestCase
         $this->assertEquals($expected, $var);
     }
 
-    public function arrayLocateProvider()
+    public function arrayLocateProvider(): array
     {
         return [
             '1st item in list' => ['list', 'apple', 0],
@@ -54,8 +57,9 @@ class HArrayLocateTest extends TestCase
      * @param string $type
      * @param string|HString $checkThing
      * @param string $exceptionMsg
+     * @throws ElementNotFoundException
      */
-    public function testElementNotFound($type, $checkThing, $exceptionMsg)
+    public function testElementNotFound(string $type, $checkThing, string $exceptionMsg): void
     {
         $this->expectException(ElementNotFoundException::class);
         $this->expectExceptionMessage($exceptionMsg);
@@ -67,7 +71,7 @@ class HArrayLocateTest extends TestCase
         }
     }
 
-    public function elementNotFoundProvider()
+    public function elementNotFoundProvider(): array
     {
         return [
             'String not in list' => ['list', 'fobble', 'Element could not be found: fobble'],
@@ -77,7 +81,7 @@ class HArrayLocateTest extends TestCase
         ];
     }
 
-    public function testLocateObjectTypeInHArray()
+    public function testLocateObjectTypeInHArray(): void
     {
         $timeStamp = new \DateTime();
         $object = new \SplDoublyLinkedList();

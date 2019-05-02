@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Haystack\Container;
 
 use Haystack\HString;
@@ -13,24 +15,20 @@ class HStringRemove
         $this->hString = $hString;
     }
 
-    /**
-     * @param string $value
-     * @return HString
-     */
-    public function remove($value)
+    public function remove(string $value): string
     {
         $key = $this->hString->locate($value);
 
-        return new HString($this->getPrefix($key) . $this->getSuffix($key));
+        return sprintf('%s%s', $this->getPrefix($key), $this->getSuffix($key));
     }
 
-    private function getPrefix($length)
+    private function getPrefix(int $length): string
     {
-        return mb_substr($this->hString, 0, $length, $this->hString->getEncoding());
+        return mb_substr((string) $this->hString, 0, $length, $this->hString->getEncoding());
     }
 
-    private function getSuffix($start)
+    private function getSuffix(int $start): string
     {
-        return mb_substr($this->hString, $start + 1, $this->hString->count() - $start, $this->hString->getEncoding());
+        return mb_substr((string) $this->hString, $start + 1, $this->hString->count() - $start, $this->hString->getEncoding());
     }
 }

@@ -1,43 +1,23 @@
 <?php
-namespace Haystack\Converter;
+declare(strict_types=1);
 
-use Haystack\HString;
+namespace Haystack\Converter;
 
 class ArrayToString
 {
-    /** @var  array */
+    /** @var array */
     private $arr;
 
-    /** @var HString|string */
+    /** @var string */
     private $glue;
 
-    /**
-     * @param array  $arr
-     * @param string $glue
-     */
-    public function __construct(array $arr, $glue = '')
+    public function __construct(array $arr, string $glue = '')
     {
         $this->arr = $arr;
-
-        $this->glue = empty($glue) ? '' : $glue;
+        $this->glue = $glue;
     }
 
-    /**
-     * @return string
-     */
-    public function toString()
-    {
-        if (is_string($this->glue) || $this->glue instanceof HString) {
-            return $this->arrayImplode();
-        }
-
-        throw new \InvalidArgumentException('glue must be a string');
-    }
-
-    /**
-     * @return string
-     */
-    private function arrayImplode()
+    public function toString(): string
     {
         return implode($this->glue, $this->arr);
     }

@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Haystack\Container;
 
 use Haystack\HArray;
@@ -20,7 +22,7 @@ class HArrayAppend
      * @param HArray|array|int|float|string $value
      * @return array
      */
-    public function append($value)
+    public function append($value): array
     {
         $value = $value instanceof HArray ? $value->toArray() : $value;
 

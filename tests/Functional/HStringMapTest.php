@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Haystack\Tests\Functional;
 
 use Haystack\HArray;
@@ -10,12 +12,12 @@ class HStringMapTest extends TestCase
     /** @var HString */
     protected $aString;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->aString = new HString('foobar');
     }
 
-    public function testStringMap()
+    public function testStringMap(): void
     {
         $capitalize = function ($letter) {
             return mb_strtoupper($letter);
@@ -25,7 +27,7 @@ class HStringMapTest extends TestCase
         $this->assertEquals('FOOBAR', $newString);
     }
 
-    public function testStringMapRot13()
+    public function testStringMapRot13(): void
     {
         $rot13 = function ($letter) {
             if (' ' === $letter || '-' === $letter) {
@@ -42,11 +44,8 @@ class HStringMapTest extends TestCase
 
     /**
      * @dataProvider arraysProvider
-     *
-     * @param HString $expected
-     * @param array $items
      */
-    public function testStringWithOneArray(HString $expected, array $items)
+    public function testStringWithOneArray(HString $expected, array $items): void
     {
         $action = function ($letterFromString, $wordFromArray) {
             return sprintf('-%s:%s-', $letterFromString, $wordFromArray);
@@ -56,7 +55,7 @@ class HStringMapTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function arraysProvider()
+    public function arraysProvider(): array
     {
         $arrFewer = ['apple', 'butter'];
         $arrEqual = ['apple', 'butter', 'cookie'];
@@ -80,11 +79,8 @@ class HStringMapTest extends TestCase
 
     /**
      * @dataProvider HArraysProvider
-     *
-     * @param HString $expected
-     * @param HArray $items
      */
-    public function testStringWithOneHArray(HString $expected, HArray $items)
+    public function testStringWithOneHArray(HString $expected, HArray $items): void
     {
         $action = function ($letterFromString, $wordFromArray) {
             return sprintf('-%s:%s-', $letterFromString, $wordFromArray);
@@ -94,7 +90,7 @@ class HStringMapTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function HArraysProvider()
+    public function HArraysProvider(): array
     {
         $arrFewer = new HArray(['apple', 'butter']);
         $arrEqual = new HArray(['apple', 'butter', 'cookie']);
@@ -118,11 +114,8 @@ class HStringMapTest extends TestCase
 
     /**
      * @dataProvider stringsProvider
-     *
-     * @param HString $expected
-     * @param string $items
      */
-    public function testStringWithOneString(HString $expected, $items)
+    public function testStringWithOneString(HString $expected, string $items): void
     {
         $action = function ($letterFromHaystack, $letterFromString) {
             return sprintf('-%s:%s-', $letterFromHaystack, $letterFromString);
@@ -132,7 +125,7 @@ class HStringMapTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function stringsProvider()
+    public function stringsProvider(): array
     {
         $strFewer = 'apple';
         $strEqual = 'butter';
@@ -156,11 +149,8 @@ class HStringMapTest extends TestCase
 
     /**
      * @dataProvider HStringsProvider
-     *
-     * @param HString $expected
-     * @param HString $items
      */
-    public function testStringWithOneHString(HString $expected, HString $items)
+    public function testStringWithOneHString(HString $expected, HString $items): void
     {
         $action = function ($letterFromHaystack, $letterFromString) {
             return sprintf('-%s:%s-', $letterFromHaystack, $letterFromString);
@@ -170,7 +160,7 @@ class HStringMapTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function HStringsProvider()
+    public function HStringsProvider(): array
     {
         $strFewer = new HString('apple');
         $strEqual = new HString('butter');
@@ -192,7 +182,7 @@ class HStringMapTest extends TestCase
         ];
     }
 
-    public function testErrorGetsThrown()
+    public function testErrorGetsThrown(): void
     {
         $this->expectException('InvalidArgumentException');
         $this->expectExceptionMessage('stdClass cannot be mapped');

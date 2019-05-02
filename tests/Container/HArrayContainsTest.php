@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace Haystack\Tests\Container;
 
 use Haystack\HArray;
@@ -6,13 +8,13 @@ use PHPUnit\Framework\TestCase;
 
 class HArrayContainsTest extends TestCase
 {
-    /** @var  \Haystack\HArray */
+    /** @var HArray */
     private $arrList;
 
-    /** @var  \Haystack\HArray */
+    /** @var HArray */
     private $arrDict;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->arrList = new HArray(['apple', 'bobble', 'cobble', 'dobble']);
         $this->arrDict = new HArray(['a' => 'apple', 'b' => 'bobble', 'c' => 'cobble', 'd' => 'dobble']);
@@ -25,7 +27,7 @@ class HArrayContainsTest extends TestCase
      * @param string|int $checkThing
      * @param bool $expected
      */
-    public function testContainsStringTypeInHArray($type, $checkThing, $expected)
+    public function testContainsStringTypeInHArray(string $type, $checkThing, bool $expected): void
     {
         if ('list' === $type) {
             $contains = $this->arrList->contains($checkThing);
@@ -35,7 +37,7 @@ class HArrayContainsTest extends TestCase
         $expected ? $this->assertTrue($contains) : $this->assertFalse($contains);
     }
 
-    public function arrayContainsProvider()
+    public function arrayContainsProvider(): array
     {
         return [
             '1st item in list' => ['list', 'apple', true],
@@ -49,7 +51,7 @@ class HArrayContainsTest extends TestCase
         ];
     }
 
-    public function testContainsObjectTypeInHArray()
+    public function testContainsObjectTypeInHArray(): void
     {
         $list = $this->arrList->append(new \SplDoublyLinkedList());
 
